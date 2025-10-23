@@ -95,4 +95,4 @@ python manage.py createsuperuser
 - The chatbot is intentionally simple and rule-based with server-side session state; it does not call external LLMs.
 
 ## License
-MIT (for demo purposes).
+MIT 
