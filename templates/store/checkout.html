@@ -1,0 +1,15 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Checkout - My E-commerce{% endblock %}
+
+{% block content %}
+  <h2>Checkout</h2>
+  <p>Total: ₹{{ total }}</p>
+  <form method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn primary" type="submit">Place Order (Cash on Delivery)</button>
+  </form>
+  <hr>
+  <p>Or pay online:</p>
+  <a class="btn" href="{% url 'store:razorpay_create_order' %}">Pay with Razorpay</a>
+{% endblock %}

@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{% block title %}ShopHub - Online Shopping{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'store/styles.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <!-- Top Header Bar -->
+    <div class="top-bar">
+      <div class="container">
+        <div class="top-bar-content">
+          <div class="logo-section">
+            <a href="/" class="logo">
+              <span class="logo-icon">🛒</span>
+              <span class="logo-text">ShopHub</span>
+            </a>
+          </div>
+          
+          <div class="search-section">
+            <form action="{% url 'store:home' %}" method="get" class="search-form">
+              <input type="text" name="q" placeholder="Search for products, brands and more" class="search-input" value="{{ current_query|default:current_category }}">
+              <button type="submit" class="search-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="m21 21-4.35-4.35"></path>
+                </svg>
+              </button>
+            </form>
+          </div>
+          
+          <div class="header-actions">
+            {% if user.is_authenticated %}
+              <div class="user-menu">
+                <a href="{% url 'store:profile' %}" class="header-link">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+                  <span>{{ user.username }}</span>
+                </a>
+              </div>
+              <a href="{% url 'store:logout' %}" class="header-link">Logout</a>
+            {% else %}
+              <a href="{% url 'store:login' %}" class="header-link login-btn">Login</a>
+              <a href="{% url 'store:register' %}" class="header-link signup-btn">Sign Up</a>
+            {% endif %}
+            
+            <a href="{% url 'store:cart' %}" class="cart-link">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+              </svg>
+              <span class="cart-text">Cart</span>
+              {% if cart_count > 0 %}
+                <span class="cart-badge">{{ cart_count }}</span>
+              {% endif %}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+      {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h4>About</h4>
+            <ul>
+              <li><a href="#">About Us</a></li>
+              <li><a href="#">Careers</a></li>
+              <li><a href="#">Press</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h4>Help</h4>
+            <ul>
+              <li><a href="#">Payments</a></li>
+              <li><a href="#">Shipping</a></li>
+              <li><a href="#">Returns</a></li>
+              <li><a href="#">FAQ</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h4>Policy</h4>
+            <ul>
+              <li><a href="#">Return Policy</a></li>
+              <li><a href="#">Terms of Use</a></li>
+              <li><a href="#">Security</a></li>
+              <li><a href="#">Privacy</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h4>Social</h4>
+            <ul>
+              <li><a href="#">Facebook</a></li>
+              <li><a href="#">Twitter</a></li>
+              <li><a href="#">Instagram</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2025 ShopHub. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+    
+    <!-- Chatbot Widget -->
+    <div id="chatbot" class="chatbot">
+      <button id="chatbot-toggle" class="chatbot-fab" aria-label="Open chat">💬</button>
+      <div class="chatbot-panel" hidden>
+        <div class="chatbot-header">
+          <strong>ShopHub Assistant</strong>
+          <button id="chatbot-close" class="chatbot-close" aria-label="Close">✕</button>
+        </div>
+        <div id="chatbot-messages" class="chatbot-messages"></div>
+        <form id="chatbot-form" class="chatbot-input">
+          <input id="chatbot-text" type="text" placeholder="Ask: cheapest, best, place order..." required />
+          <button type="submit" class="btn primary">Send</button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      (function(){
+        const fab = document.getElementById('chatbot-toggle');
+        const panel = document.querySelector('.chatbot-panel');
+        const closeBtn = document.getElementById('chatbot-close');
+        const form = document.getElementById('chatbot-form');
+        const input = document.getElementById('chatbot-text');
+        const feed = document.getElementById('chatbot-messages');
+
+        function csrftoken(){
+          const m = document.cookie.match(/csrftoken=([^;]+)/); return m?m[1]:'';
+        }
+        function addMsg(text, who){
+          const div = document.createElement('div');
+          div.className = 'msg ' + (who||'bot');
+          div.textContent = text;
+          feed.appendChild(div);
+          feed.scrollTop = feed.scrollHeight;
+        }
+        fab.addEventListener('click', ()=>{ panel.hidden = false; input.focus(); });
+        closeBtn.addEventListener('click', ()=>{ panel.hidden = true; });
+        form.addEventListener('submit', async (e)=>{
+          e.preventDefault();
+          const text = input.value.trim();
+          if(!text) return;
+          addMsg(text, 'me');
+          input.value='';
+          try{
+            const res = await fetch('{% url "store:chatbot_message" %}', {
+              method:'POST',
+              headers:{'Content-Type':'application/x-www-form-urlencoded','X-CSRFToken': csrftoken()},
+              body: new URLSearchParams({message:text}).toString()
+            });
+            const data = await res.json();
+            addMsg(data.reply || '...');
+          }catch(err){
+            addMsg('Sorry, something went wrong.');
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>

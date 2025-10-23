@@ -1,0 +1,28 @@
+{% extends 'store/base.html' %}
+
+{% block content %}
+  <div class="container">
+    <div class="auth-card">
+      <h2 class="auth-title">Create your ShopHub account</h2>
+      <form method="post" class="auth-form">{% csrf_token %}
+        <!-- Render the Django form fields; they should get styled by the form-field rules -->
+        {{ form.non_field_errors }}
+        {% for field in form %}
+          <div class="form-field">
+            {{ field.label_tag }}
+            {{ field }}
+            <div class="field-errors">{{ field.errors }}</div>
+          </div>
+        {% endfor %}
+
+        <div class="form-actions">
+          <button type="submit" class="add-to-cart-btn">Register</button>
+        </div>
+      </form>
+
+      <div class="auth-footer">
+        <p>Already have an account? <a href="{% url 'store:login' %}">Sign in</a></p>
+      </div>
+    </div>
+  </div>
+{% endblock %}

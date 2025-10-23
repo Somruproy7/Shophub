@@ -1,0 +1,11 @@
+{
+  "python.pythonPath": "C:\\Users\\Somrup\\Downloads\\myecommerceapp\\.venv\\Scripts\\python.exe",
+  "python.defaultInterpreterPath": "C:\\Users\\Somrup\\Downloads\\myecommerceapp\\.venv\\Scripts\\python.exe",
+  "python.analysis.autoSearchPaths": true,
+  "python.analysis.extraPaths": [
+    "./",
+    ".venv\\Lib\\site-packages"
+  ],
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.packageIndexDepth": 2
+}

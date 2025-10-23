@@ -1,0 +1,8 @@
+{% extends 'store/base.html' %}
+
+{% block content %}
+  <h2>Razorpay Payment</h2>
+  <p>Order created with id: {{ razor_order.id }}</p>
+  <p>Amount: ₹{{ amount|floatformat:2 }}</p>
+  <p>This template is a placeholder — integrate the Razorpay JS checkout here with your keys.</p>
+{% endblock %}
