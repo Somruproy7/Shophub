@@ -19,6 +19,10 @@ def seed_demo_data():
         argv = " ".join(sys.argv).lower()
         if any(cmd in argv for cmd in ["makemigrations", "migrate", "collectstatic", "shell", "createsuperuser", "test"]):
             return
+        
+        # Don't seed if not in a request context
+        if 'runserver' not in argv and 'gunicorn' not in argv:
+            return
 
         with transaction.atomic():
             cats = {
