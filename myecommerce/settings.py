@@ -3,7 +3,6 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 load_dotenv(BASE_DIR / '.env')
 
 MONGO_URI = os.environ.get('MONGO_URI', 'mongodb://localhost:27017')
@@ -13,9 +12,7 @@ RAZOR_KEY_ID = os.environ.get('RAZOR_KEY_ID', '')
 RAZOR_KEY_SECRET = os.environ.get('RAZOR_KEY_SECRET', '')
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'replace-this-with-a-secure-secret')
-
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
-
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
 
 CSRF_TRUSTED_ORIGINS = os.environ.get(
@@ -69,7 +66,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'myecommerce.wsgi.application'
 
 import dj_database_url
-
 DATABASES = {
     'default': dj_database_url.config(
         default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
@@ -90,6 +86,7 @@ CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
     'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+    'STATICFILES_MANIFEST_ROOT': os.path.join(BASE_DIR, 'staticfiles'),
 }
 if os.environ.get('CLOUDINARY_CLOUD_NAME'):
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
