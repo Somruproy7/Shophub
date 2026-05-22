@@ -1,0 +1,59 @@
+{% extends 'store/base.html' %}
+
+{% block title %}{{ product.title }} - My E-commerce{% endblock %}
+
+{% block content %}
+  <div class="product-detail">
+    <div class="left">
+      {% if product.image %}
+        <img src="{{ product.image.url }}" alt="{{ product.title }}">
+      {% else %}
+        <img src="https://source.unsplash.com/featured/?{{ product.title|urlencode }},product&sig={{ product.id }}" alt="{{ product.title }}">
+      {% endif %}
+    </div>
+    <div class="right">
+      <h2>{{ product.title }}</h2>
+      <p class="price">₹{{ product.price }}</p>
+      <p>{{ product.description }}</p>
+
+      <div class="details-card">
+        <h3>Highlights</h3>
+        <ul class="highlights">
+          {% for h in product.highlights %}
+            <li>{{ h }}</li>
+          {% endfor %}
+        </ul>
+        <p class="muted">Warranty: {{ product.warranty_months }} months · Ships in {{ product.ship_eta_days }} days</p>
+      </div>
+
+      <div class="details-card">
+        <h3>Product Details</h3>
+        <table class="specs-table">
+          <tbody>
+            <tr>
+              <th>Brand / Maker</th>
+              <td>{{ product.brand|default:product.maker|default:'Not specified' }}</td>
+            </tr>
+            <tr>
+              <th>Distributor</th>
+              <td>{{ product.distributor|default:'Not specified' }}</td>
+            </tr>
+            <tr>
+              <th>Category</th>
+              <td>{% if product.category %}{{ product.category }}{% else %}Not specified{% endif %}</td>
+            </tr>
+            <tr>
+              <th>Availability</th>
+              <td>{% if product.available %}In stock{% else %}Out of stock{% endif %}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="actions">
+        <a class="btn" href="{% url 'store:add_to_cart' product_id=product.id %}">Add to Cart</a>
+        <a class="btn primary" href="{% url 'store:buy_now' product_id=product.id %}">Buy Now</a>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,227 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Razorpay Payment - ShopHub{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="payment-container">
+    <div class="payment-card">
+      <div class="payment-header">
+        <h2>Complete Your Payment</h2>
+        <p>Secure payment powered by Razorpay</p>
+      </div>
+      
+      <div class="payment-details">
+        <div class="detail-row">
+          <span class="label">Order ID:</span>
+          <span class="value">{{ razor_order.id }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Amount:</span>
+          <span class="value amount">₹{{ amount|floatformat:2 }}</span>
+        </div>
+      </div>
+      
+      <button id="rzp-button" class="btn primary pay-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+          <line x1="1" y1="10" x2="23" y2="10"></line>
+        </svg>
+        Pay ₹{{ amount|floatformat:2 }}
+      </button>
+      
+      <a href="{% url 'store:cart' %}" class="btn cancel-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+        Cancel Payment
+      </a>
+      
+      <div class="payment-info">
+        <p>✓ Secure payment gateway</p>
+        <p>✓ Multiple payment options</p>
+        <p>✓ Instant confirmation</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.payment-container {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.payment-card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: var(--shadow-2);
+  border: 1px solid var(--surface-border);
+}
+
+.payment-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.payment-header h2 {
+  font-size: 24px;
+  font-weight: 800;
+  color: #0b1220;
+  margin-bottom: 8px;
+}
+
+.payment-header p {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.payment-details {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+}
+
+.detail-row .label {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.detail-row .value {
+  color: #0b1220;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.detail-row .amount {
+  font-size: 24px;
+  color: var(--brand-blue);
+}
+
+.pay-btn {
+  width: 100%;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  border: none;
+}
+
+.pay-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(40, 116, 240, 0.3);
+}
+
+.cancel-btn {
+  width: 100%;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: transparent;
+  color: var(--muted);
+  border: 2px solid var(--surface-border);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.2s;
+  margin-bottom: 20px;
+}
+
+.cancel-btn:hover {
+  background: #f9fafb;
+  color: #0b1220;
+  border-color: #d1d5db;
+  transform: translateY(-1px);
+}
+
+.payment-info {
+  text-align: center;
+  padding-top: 20px;
+  border-top: 1px solid var(--surface-border);
+}
+
+.payment-info p {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 6px 0;
+}
+</style>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+document.getElementById('rzp-button').onclick = function(e){
+  e.preventDefault();
+  
+  var options = {
+    "key": "{{ razor_key_id }}",
+    "amount": "{{ amount }}",
+    "currency": "INR",
+    "name": "ShopHub",
+    "description": "Order Payment",
+    "image": "https://cdn-icons-png.flaticon.com/512/3081/3081559.png",
+    "order_id": "{{ razor_order.id }}",
+    "handler": function (response){
+      // Payment successful
+      alert('Payment successful!');
+      alert('Payment ID: ' + response.razorpay_payment_id);
+      alert('Order ID: ' + response.razorpay_order_id);
+      alert('Signature: ' + response.razorpay_signature);
+      
+      // Redirect to success page or order detail
+      window.location.href = '/profile/';
+    },
+    "prefill": {
+      "name": "{{ user.get_full_name|default:user.username }}",
+      "email": "{{ user.email }}",
+      "contact": ""
+    },
+    "notes": {
+      "address": "ShopHub Order"
+    },
+    "theme": {
+      "color": "#2874f0"
+    },
+    "modal": {
+      "ondismiss": function(){
+        // Redirect to cart when payment modal is closed
+        window.location.href = '{% url "store:cart" %}';
+      }
+    }
+  };
+  
+  var rzp1 = new Razorpay(options);
+  rzp1.on('payment.failed', function (response){
+    alert('Payment failed!');
+    alert('Error Code: ' + response.error.code);
+    alert('Error Description: ' + response.error.description);
+    alert('Error Source: ' + response.error.source);
+    alert('Error Step: ' + response.error.step);
+    alert('Error Reason: ' + response.error.reason);
+    alert('Order ID: ' + response.error.metadata.order_id);
+    alert('Payment ID: ' + response.error.metadata.payment_id);
+  });
+  
+  rzp1.open();
+}
+</script>
+{% endblock %}

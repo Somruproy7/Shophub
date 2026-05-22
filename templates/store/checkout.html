@@ -1,0 +1,249 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Checkout - ShopHub{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="checkout-container">
+    <div class="checkout-header">
+      <h2>Checkout</h2>
+      <p>Complete your order</p>
+    </div>
+    
+    <div class="checkout-content">
+      <!-- Order Summary -->
+      <div class="order-summary">
+        <h3>Order Summary</h3>
+        <div class="summary-row">
+          <span>Total Amount:</span>
+          <span class="total-amount">₹{{ total }}</span>
+        </div>
+      </div>
+      
+      <!-- Shipping Address Form -->
+      <div class="address-form-section">
+        <h3>Shipping Address</h3>
+        <form method="post" class="checkout-form">
+          {% csrf_token %}
+          
+          {% for field in form %}
+            <div class="form-field">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}
+                <div class="field-errors">{{ field.errors }}</div>
+              {% endif %}
+            </div>
+          {% endfor %}
+          
+          <div class="payment-options">
+            <h3>Payment Method</h3>
+            
+            <button type="submit" class="payment-btn cod-btn">
+              <div class="payment-icon">💵</div>
+              <div class="payment-details">
+                <strong>Cash on Delivery</strong>
+                <span>Pay when you receive</span>
+              </div>
+            </button>
+          </div>
+        </form>
+        
+        <div class="payment-divider">
+          <span>OR</span>
+        </div>
+        
+        <a href="{% url 'store:razorpay_create_order' %}" class="payment-btn razorpay-btn">
+          <div class="payment-icon">💳</div>
+          <div class="payment-details">
+            <strong>Pay Online with Razorpay</strong>
+            <span>Credit/Debit Card, UPI, Net Banking</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.checkout-container {
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.checkout-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.checkout-header h2 {
+  font-size: 28px;
+  font-weight: 800;
+  color: #0b1220;
+  margin-bottom: 8px;
+}
+
+.checkout-header p {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.checkout-content {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: var(--shadow-1);
+  border: 1px solid var(--surface-border);
+}
+
+.order-summary {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.order-summary h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 15px;
+  color: #0b1220;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+}
+
+.total-amount {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--brand-blue);
+}
+
+.address-form-section h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #0b1220;
+}
+
+.checkout-form .form-field {
+  margin-bottom: 18px;
+}
+
+.payment-options {
+  margin-top: 30px;
+}
+
+.payment-options h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 15px;
+  color: #0b1220;
+}
+
+.payment-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 18px 20px;
+  border: 2px solid var(--surface-border);
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  color: inherit;
+}
+
+.payment-btn:hover {
+  border-color: var(--brand-blue);
+  box-shadow: 0 4px 12px rgba(40, 116, 240, 0.15);
+  transform: translateY(-2px);
+}
+
+.payment-icon {
+  font-size: 32px;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.payment-details {
+  flex: 1;
+  text-align: left;
+}
+
+.payment-details strong {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0b1220;
+  margin-bottom: 4px;
+}
+
+.payment-details span {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.cod-btn {
+  margin-bottom: 0;
+}
+
+.payment-divider {
+  text-align: center;
+  margin: 20px 0;
+  position: relative;
+}
+
+.payment-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--surface-border);
+}
+
+.payment-divider span {
+  position: relative;
+  background: var(--card-bg);
+  padding: 0 15px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.razorpay-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: transparent;
+  color: #fff;
+}
+
+.razorpay-btn .payment-icon {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.razorpay-btn .payment-details strong,
+.razorpay-btn .payment-details span {
+  color: #fff;
+}
+
+.razorpay-btn:hover {
+  border-color: transparent;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+</style>
+{% endblock %}

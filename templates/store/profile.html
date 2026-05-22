@@ -1,0 +1,46 @@
+{% extends 'store/base.html' %}
+
+{% block content %}
+  <h2>Your Profile</h2>
+  <form method="post" enctype="multipart/form-data">{% csrf_token %}
+    <div class="auth-card" style="margin:12px 0;">
+      <h3 class="auth-title">Account</h3>
+      {{ uform.as_p }}
+    </div>
+    <div class="auth-card" style="margin:12px 0;">
+      <h3 class="auth-title">Profile</h3>
+      {{ pform.as_p }}
+    </div>
+    <div class="auth-card" style="margin:12px 0;">
+      <h3 class="auth-title">Default Address</h3>
+      {{ aform.as_p }}
+    </div>
+    <div class="form-actions">
+      <button class="btn primary" type="submit">Save</button>
+    </div>
+  </form>
+
+  <h3 style="margin-top:20px">Your Orders</h3>
+  {% if orders %}
+    <table class="cart-table">
+      <thead><tr><th>#</th><th>Date</th><th>Total</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        {% for o in orders %}
+          <tr>
+            <td><a href="{% url 'store:order_detail' order_id=o.id %}">#{{ o.id }}</a></td>
+            <td>{{ o.created_at }}</td>
+            <td>₹{{ o.total }}</td>
+            <td>{% if o.paid %}Paid{% else %}Unpaid{% endif %}</td>
+            <td>
+              {% if not o.paid %}
+                <a class="btn" href="{% url 'store:order_edit' order_id=o.id %}">Edit</a>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No orders yet.</p>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'store/base.html' %}
+
+{% block content %}
+  <h2>Edit Order #{{ order.id }}</h2>
+  <form method="post">{% csrf_token %}
+    <h3>Shipping Address</h3>
+    <div class="cart-table" style="padding:16px; border-radius:8px;">
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px;">
+        <label>Full Name<input type="text" name="full_name" value="{{ order.address.full_name|default_if_none:'' }}" /></label>
+        <label>Line 1<input type="text" name="line1" value="{{ order.address.line1|default_if_none:'' }}" /></label>
+        <label>Line 2<input type="text" name="line2" value="{{ order.address.line2|default_if_none:'' }}" /></label>
+        <label>City<input type="text" name="city" value="{{ order.address.city|default_if_none:'' }}" /></label>
+        <label>State<input type="text" name="state" value="{{ order.address.state|default_if_none:'' }}" /></label>
+        <label>Postal Code<input type="text" name="postal_code" value="{{ order.address.postal_code|default_if_none:'' }}" /></label>
+        <label>Country<input type="text" name="country" value="{{ order.address.country|default_if_none:'' }}" /></label>
+      </div>
+    </div>
+
+    <h3 style="margin-top:16px">Items</h3>
+    <table class="cart-table">
+      <thead><tr><th>Product</th><th>Qty</th><th>Price</th></tr></thead>
+      <tbody>
+        {% for it in order.items.all %}
+          <tr>
+            <td>{{ it.product.title }}</td>
+            <td>
+              <input class="qty-input" type="number" name="quantity_{{ it.id }}" value="{{ it.quantity }}" min="0" />
+            </td>
+            <td>₹{{ it.price }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="cart-actions">
+      <a class="btn" href="{% url 'store:order_detail' order_id=order.id %}">Cancel</a>
+      <button class="btn primary" type="submit">Save Changes</button>
+    </div>
+  </form>
+{% endblock %}

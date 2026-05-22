@@ -1,0 +1,78 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Your Cart - My E-commerce{% endblock %}
+
+{% block content %}
+  <h2>Your Cart</h2>
+  {% if items %}
+    <table class="cart-table">
+      <thead><tr><th>Product</th><th>Qty</th><th>Price</th><th></th></tr></thead>
+      <tbody id="cart-body">
+        {% for it in items %}
+          <tr data-product-id="{{ it.product.id }}">
+            <td>{{ it.product.title }}</td>
+            <td>
+              <button class="qty-btn" data-action="dec">-</button>
+              <input class="qty-input" type="number" value="{{ it.quantity }}" min="0" style="width:60px">
+              <button class="qty-btn" data-action="inc">+</button>
+            </td>
+            <td class="item-price">₹{{ it.price }}</td>
+            <td><a class="remove-link" href="{% url 'store:remove_from_cart' product_id=it.product.id %}">Remove</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p class="total">Total: ₹<span id="cart-total">{{ total }}</span></p>
+    <div class="cart-actions">
+      <a class="btn danger" href="{% url 'store:clear_cart' %}">Clear Cart</a>
+      <a class="btn primary" href="{% url 'store:checkout' %}">Proceed to Checkout</a>
+    </div>
+  {% else %}
+    <p>Your cart is empty.</p>
+  {% endif %}
+
+  <script>
+    (function(){
+      function csrftoken() {
+        const cookies = document.cookie.split(';').map(c=>c.trim());
+        for (const c of cookies) {
+          if (c.startsWith('csrftoken=')) return c.split('=')[1];
+        }
+        return '';
+      }
+
+      function post(url, data){
+        return fetch(url, {
+          method: 'POST',
+          headers: {'Content-Type':'application/x-www-form-urlencoded', 'X-CSRFToken': csrftoken()},
+          body: new URLSearchParams(data)
+        }).then(r=>r.json());
+      }
+
+      document.querySelectorAll('.qty-btn').forEach(btn=>{
+        btn.addEventListener('click', function(){
+          const tr = this.closest('tr');
+          const pid = tr.dataset.productId;
+          const action = this.dataset.action;
+          post(`/cart/update/${pid}/`, {action: action}).then(data=>{
+            if (data.quantity !== undefined) {
+              tr.querySelector('.qty-input').value = data.quantity;
+              document.getElementById('cart-total').textContent = data.total;
+            }
+          }).catch(console.error);
+        });
+      });
+
+      document.querySelectorAll('.qty-input').forEach(input=>{
+        input.addEventListener('change', function(){
+          const tr = this.closest('tr');
+          const pid = tr.dataset.productId;
+          const q = this.value;
+          post(`/cart/update/${pid}/`, {action: 'set', quantity: q}).then(data=>{
+            if (data.total !== undefined) document.getElementById('cart-total').textContent = data.total;
+          }).catch(console.error);
+        });
+      });
+    })();
+  </script>
+{% endblock %}
