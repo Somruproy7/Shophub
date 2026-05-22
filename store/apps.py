@@ -9,8 +9,3 @@ class StoreConfig(AppConfig):
             import store.signals  # noqa: F401
         except Exception:
             pass
-        try:
-            from . import seed
-            seed.seed_demo_data()
-        except Exception:
-            pass
