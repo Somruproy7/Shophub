@@ -3,6 +3,9 @@ from django.dispatch import receiver
 from django.contrib.auth.models import User
 from .models import Profile, Product, Order
 from . import mongo
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @receiver(post_save, sender=User)
@@ -19,22 +22,25 @@ def save_user_profile(sender, instance, **kwargs):
         pass
 
 
-# Sync users to MongoDB
 @receiver(post_save, sender=User)
 def sync_user_to_mongo(sender, instance, **kwargs):
-    """Sync user to MongoDB whenever user is created or updated."""
     mongo.upsert_user(instance)
 
 
 @receiver(post_delete, sender=User)
 def remove_user_from_mongo(sender, instance, **kwargs):
-    """Remove user from MongoDB when deleted."""
     mongo.remove_user(instance)
 
 
-# Sync products to MongoDB
 @receiver(post_save, sender=Product)
 def sync_product_to_mongo(sender, instance, created, **kwargs):
+    image_url = None
+    try:
+        if instance.image and instance.image.name:
+            image_url = instance.image.url
+    except Exception as e:
+        logger.error(f"Image URL error for {instance.slug}: {e}")
+    logger.info(f"Syncing product {instance.slug} to mongo, image_url={image_url}")
     mongo.upsert_product(instance)
 
 
@@ -43,8 +49,6 @@ def remove_product_from_mongo(sender, instance, **kwargs):
     mongo.remove_product(instance)
 
 
-# When an order is saved, persist it to MongoDB
 @receiver(post_save, sender=Order)
 def sync_order_to_mongo(sender, instance, created, **kwargs):
-    # always upsert order doc
     mongo.save_order(instance)
