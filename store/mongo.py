@@ -34,7 +34,7 @@ def upsert_product(product):
             'category': product.category.name if getattr(product, 'category', None) else None,
             'image_url': product.image.url if getattr(product, 'image', None) and getattr(product.image, 'url', None) else None,
         }
-        db.products.replace_one({'_id': doc['_id']}, doc, upsert=True)
+        db.products.replace_one({'slug': doc['slug']}, doc, upsert=True)
     except Exception:
         # Fail silently to avoid breaking the main request flow
         pass
