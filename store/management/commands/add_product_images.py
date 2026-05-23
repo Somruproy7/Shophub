@@ -39,7 +39,7 @@ class Command(BaseCommand):
                         public_id=f"products/{product.slug}",
                         overwrite=True,
                     )
-                    product.image = result['public_id']
+                    product.image = result['secure_url']
                     product.save()
                     self.stdout.write(self.style.SUCCESS(f'✓ {product.title}'))
                 except Exception as e:
