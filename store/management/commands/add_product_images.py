@@ -30,7 +30,7 @@ class Command(BaseCommand):
         }
 
         for product in Product.objects.all():
-            if product.slug in image_urls and not product.image:
+            if product.slug in image_urls:
                 url = image_urls[product.slug]
                 try:
                     self.stdout.write(f"Uploading image for {product.title}...")
